@@ -1,6 +1,6 @@
-import logo from './logo.svg';
 import './App.css';
 import { Component } from 'react';
+
 
 class App extends Component {
 
@@ -8,25 +8,45 @@ class App extends Component {
     super();
 
     this.state = {
-      name : 'Boi'
-    }
+        monsters : [],
+        search : ''
+      };
+  }
+  
+  componentDidMount(){
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then(res => res.json())
+      .then(users => this.setState(() => {
+          return { monsters : users };
+        }
+      ));
+  }
+
+  onSearchChange = (event) => {
+    let search = event.target.value.toLowerCase();
+    this.setState(() => {
+      return { search }
+    })
   }
 
   render(){
+    const {monsters, search} = this.state;
+    const {onSearchChange} = this;
+
+    const filtered = monsters.filter(monster => {
+      return monster.name.toLowerCase().includes(search)
+    })
+
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Hi {this.state.name}!
-          </p>
-          <button onClick={() => {
-            this.setState({name : 'Mauro'});
-            console.log(this.state);
-          }}>Change Name</button>
-        </header>
+        <input className = 'searchBox' type = 'search' placeholder = "search" onChange={onSearchChange}/>
+        {filtered.map(monster => 
+          <div key={monster.id}>
+            <h1>{monster.name}</h1>
+          </div>
+        )}
       </div>
-    );
+    )
   }
 }
 
